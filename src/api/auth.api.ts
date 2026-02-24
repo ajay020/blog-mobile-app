@@ -22,6 +22,7 @@ export const authApi = {
             API_ENDPOINTS.LOGIN,
             credentials
         );
+        console.log('API login response: ', response);
         return response;
     },
 

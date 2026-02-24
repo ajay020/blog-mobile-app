@@ -1,9 +1,23 @@
-import React from 'react'
-import { Text } from 'react-native'
+import { Button } from '@/components/common';
+import { useAuth } from '@/hooks';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { Text, View } from 'react-native';
 
 function Profile() {
+  const { logout } = useAuth();
+  const router = useRouter();
+
+  function handleLogout() {
+    logout();
+    router.push('/login');
+  }
+
   return (
-    <Text>Profile</Text>
+    <View>
+      <Text>Profile</Text>
+      <Button title="Logout" onPress={handleLogout} />
+    </View>
   )
 }
 

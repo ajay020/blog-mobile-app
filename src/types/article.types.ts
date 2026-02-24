@@ -1,11 +1,11 @@
-// import { OutputData } from '@editorjs/editorjs';
+import { OutputData } from '@editorjs/editorjs';
 
 export interface Article {
     _id: string;
     title: string;
     slug: string;
     coverImage?: string;
-    // content: OutputData;
+    content: OutputData;
     excerpt?: string;
     author: {
         _id: string;

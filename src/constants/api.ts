@@ -1,7 +1,9 @@
-// Update this with your actual backend API URL
 export const API_BASE_URL = __DEV__
-    ? 'http://172.21.212.37:5000/api' // For development
-    : 'https://your-production-api.com/api'; // For production
+    ? 'http://10.145.203.37:5000/api' // For development
+    : ' https://blog-backend-a08f.onrender.com/api'; // For production
+
+
+// console.log('API_BASE_URL:', API_BASE_URL);
 
 export const API_ENDPOINTS = {
     // Auth endpoints

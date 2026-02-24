@@ -42,7 +42,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         try {
             const response = await authApi.login(credentials);
-            console.log('Login response:', response);
+            console.log('Login response: ', response);
             const { user, token } = response;
 
             // Store auth data

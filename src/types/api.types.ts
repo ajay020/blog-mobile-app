@@ -1,3 +1,5 @@
+import { Article } from "./article.types";
+
 export interface ApiResponse<T> {
     data: T;
     message?: string;
@@ -12,6 +14,14 @@ export interface PaginatedResponse<T> {
         total: number;
         totalPages: number;
     };
+}
+
+export interface ArticleResponse {
+    success: boolean,
+    data: Article[],
+    totalPages: number,
+    currentPage: number,
+    total: number,
 }
 
 export interface ApiError {

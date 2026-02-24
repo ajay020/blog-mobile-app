@@ -63,11 +63,16 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
                 tag: params.tag,
             });
 
+            console.log("Articles", response);
+
             set({
                 articles: response.data,
                 pagination: {
-                    ...response.pagination,
-                    hasMore: response.pagination.page < response.pagination.totalPages,
+                    page: response.currentPage,
+                    totalPages: response.totalPages,
+                    total: response.total,
+                    hasMore: response.currentPage < response.totalPages,
+                    limit: 10
                 },
                 isLoading: false,
             });
@@ -95,8 +100,11 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
             set((state) => ({
                 articles: [...state.articles, ...response.data],
                 pagination: {
-                    ...response.pagination,
-                    hasMore: response.pagination.page < response.pagination.totalPages,
+                    page: response.currentPage,
+                    totalPages: response.totalPages,
+                    total: response.total,
+                    hasMore: response.currentPage < response.totalPages,
+                    limit: 10
                 },
                 isLoadingMore: false,
             }));

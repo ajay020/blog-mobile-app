@@ -2,10 +2,10 @@ import { API_ENDPOINTS } from '@/constants/api';
 import {
     ApiResponse,
     Article,
+    ArticleResponse,
     Comment,
     CreateArticleDto,
-    PaginatedResponse,
-    UpdateArticleDto,
+    UpdateArticleDto
 } from '@/types';
 import { apiClient } from './client';
 
@@ -21,12 +21,14 @@ export const articlesApi = {
         limit?: number;
         tag?: string;
         authorId?: string;
-    }): Promise<PaginatedResponse<Article>> => {
-        const response = await apiClient.get<ApiResponse<PaginatedResponse<Article>>>(
+    }): Promise<ArticleResponse> => {
+        const response = await apiClient.get<ArticleResponse>(
             API_ENDPOINTS.ARTICLES,
             { params }
         );
-        return response.data;
+
+        // console.log("RESPONSE", response)
+        return response;
     },
 
     /**

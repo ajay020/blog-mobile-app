@@ -17,7 +17,7 @@ import {
 
 export default function LoginScreen() {
     const router = useRouter();
-    const { login, isLoading } = useAuthStore();
+    const { login, isLoading, error } = useAuthStore();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -61,7 +61,7 @@ export default function LoginScreen() {
             });
 
             // Navigation to main app is handled by auth state change in index.tsx
-            // router.push("/(tabs)");
+            router.push("/(tabs)");
 
         } catch (error: any) {
             Alert.alert('Login Failed', error.message || 'Please try again');
@@ -94,6 +94,12 @@ export default function LoginScreen() {
                     <Text style={styles.title}>Welcome Back</Text>
                     <Text style={styles.subtitle}>Sign in to continue reading</Text>
                 </View>
+
+                {error && (
+                    <View style={styles.errorContainer}>
+                        <Text style={styles.errorText}>{error}</Text>
+                    </View>
+                )}
 
                 <View style={styles.form}>
                     <Input
@@ -160,6 +166,17 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         justifyContent: 'center',
         padding: SPACING.lg,
+    },
+    errorContainer: {
+        backgroundColor: COLORS.backgroundSecondary,
+        padding: SPACING.md,
+        borderRadius: 8,
+        marginBottom: SPACING.lg,
+    },
+    errorText: {
+        color: COLORS.error,
+        fontSize: FONT_SIZES.sm,
+        textAlign: 'center',
     },
     header: {
         alignItems: 'center',
