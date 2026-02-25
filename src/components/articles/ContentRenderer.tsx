@@ -20,6 +20,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ blocks }) => {
 
     console.log("Rendering content with blocks:", blocks);
 
+
     const renderBlocks = () => {
         return (blocks.map((block, index) => {
             switch (block.type) {
@@ -45,6 +46,24 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ blocks }) => {
                                 color: '#292929',
                                 marginBottom: 16,
                             }}
+                            tagsStyles={{
+                                p: {
+                                    marginBottom: 16,
+                                },
+                                a: {
+                                    color: '#1a0dab',
+                                    textDecorationLine: 'underline',
+                                },
+                                b: {
+                                    fontWeight: 'bold',
+                                },
+                                i: {
+                                    fontStyle: 'italic',
+                                },
+                                u: {
+                                    textDecorationLine: 'underline',
+                                },
+                            }}
                         />
                     );
 
@@ -67,8 +86,31 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ blocks }) => {
                         <View key={block.id || index} style={styles.listContainer}>
                             {block.data.items.map((item: any, i: number) => (
                                 <View key={i} style={styles.listItem}>
-                                    <Text style={styles.bullet}>{block.data.items.style === 'ordered' ? `${i + 1}.` : '•'}</Text>
-                                    <Text style={styles.listText}>{item.content}</Text>
+                                    <Text style={styles.bullet}>
+                                        {block.data.items.style === 'ordered' ? `${i + 1}.` : '•'}
+                                    </Text>
+                                    <RenderHtml
+                                        contentWidth={width - 40}
+                                        source={{ html: item.content }}
+                                        baseStyle={styles.listText}
+                                        tagsStyles={{
+                                            p: {
+                                                marginBottom: 16,
+                                            },
+                                            a: {
+                                                color: '#1a0dab',
+                                                textDecorationLine: 'underline',
+                                            },
+                                            b: {
+                                                fontWeight: 'bold',
+                                            },
+                                            i: {
+                                                fontStyle: 'italic',
+                                            },
+                                            u: {
+                                                textDecorationLine: 'underline',
+                                            },
+                                        }} />
                                 </View>
                             ))}
                         </View>
@@ -86,14 +128,16 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ blocks }) => {
                 case 'quote':
                     return (
                         <View key={block.id || index} style={{ marginVertical: 20, paddingLeft: 16, borderLeftWidth: 4, borderLeftColor: '#eee' }}>
-                            <Text style={{ fontStyle: 'italic', color: '#555', fontSize: 18, lineHeight: 28 }}>
-                                {block.data.text}
-                            </Text>
+                            <RenderHtml
+                                contentWidth={width - 40}
+                                source={{ html: block.data.text }}
+                                baseStyle={{ fontStyle: 'italic', color: '#555', fontSize: 18, lineHeight: 28 }}
+                            />
                             {block.data.caption && (
                                 <Text style={{
                                     textAlign: 'right',
                                     color: '#6b6b6b',
-                                    fontSize: 14, marginTop: 8
+                                    fontSize: 14, marginTop: 4
                                 }}>
                                     — {block.data.caption}
                                 </Text>
@@ -168,8 +212,17 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginTop: 8,
     },
-    listContainer: { marginBottom: 16 },
-    listItem: { flexDirection: 'row', marginBottom: 8, paddingRight: 20 },
+    listContainer: {
+        marginBottom: 16,
+    },
+    listItem: {
+        // backgroundColor: '#f9f9f9',
+        flexDirection: 'row',
+        flex: 1,
+        alignItems: 'flex-start',
+        marginBottom: 4,
+        paddingRight: 20
+    },
     bullet: { fontSize: 18, marginRight: 10, color: '#292929' },
     listText: { fontSize: FONT_SIZES.lg, lineHeight: 28, color: '#292929', flex: 1 },
 });

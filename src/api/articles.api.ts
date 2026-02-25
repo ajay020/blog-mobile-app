@@ -5,6 +5,7 @@ import {
     ArticleResponse,
     Comment,
     CreateArticleDto,
+    LikeResponse,
     UpdateArticleDto
 } from '@/types';
 import { apiClient } from './client';
@@ -85,21 +86,11 @@ export const articlesApi = {
     /**
      * Like an article
      */
-    likeArticle: async (id: string): Promise<Article> => {
-        const response = await apiClient.post<ApiResponse<Article>>(
+    likeArticle: async (id: string): Promise<LikeResponse> => {
+        const response = await apiClient.post<LikeResponse>(
             API_ENDPOINTS.ARTICLE_LIKE(id)
         );
-        return response.data;
-    },
-
-    /**
-     * Unlike an article
-     */
-    unlikeArticle: async (id: string): Promise<Article> => {
-        const response = await apiClient.delete<ApiResponse<Article>>(
-            API_ENDPOINTS.ARTICLE_UNLIKE(id)
-        );
-        return response.data;
+        return response;
     },
 
     /**

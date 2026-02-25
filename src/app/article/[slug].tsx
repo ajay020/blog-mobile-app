@@ -8,7 +8,12 @@ import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 're
 
 export default function ArticleDetail() {
     const { slug } = useLocalSearchParams<{ slug: string }>();
-    const { selectedArticle, fetchArticleBySlug, isLoading, clearSelectedArticle } = useArticlesStore();
+    const {
+        selectedArticle,
+        fetchArticleBySlug,
+        isLoading,
+        clearSelectedArticle
+    } = useArticlesStore();
 
     useEffect(() => {
         if (slug) fetchArticleBySlug(slug);

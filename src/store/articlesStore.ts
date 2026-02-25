@@ -5,9 +5,7 @@ import { create } from 'zustand';
 interface ArticlesState {
     // State
     articles: Article[];
-    currentArticle: Article | null;
     selectedArticle: Article | null;
-
     myArticles: Article[];
     isLoading: boolean;
     isLoadingMore: boolean;
@@ -26,16 +24,13 @@ interface ArticlesState {
         limit?: number;
         tag?: string;
     }) => Promise<void>;
-    fetchMoreArticles: () => Promise<void>;
     fetchArticleById: (id: string) => Promise<void>;
     fetchArticleBySlug: (slug: string) => Promise<void>;
     createArticle: (data: CreateArticleDto) => Promise<Article>;
     updateArticle: (id: string, data: UpdateArticleDto) => Promise<void>;
     deleteArticle: (id: string) => Promise<void>;
     likeArticle: (id: string) => Promise<void>;
-    unlikeArticle: (id: string) => Promise<void>;
     fetchMyArticles: () => Promise<void>;
-    clearCurrentArticle: () => void;
     clearSelectedArticle: () => void;
     clearError: () => void;
 }
@@ -43,7 +38,6 @@ interface ArticlesState {
 export const useArticlesStore = create<ArticlesState>((set, get) => ({
     // Initial state
     articles: [],
-    currentArticle: null,
     selectedArticle: null,
     myArticles: [],
     isLoading: false,
@@ -87,37 +81,6 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
         }
     },
 
-    // Fetch more articles (pagination)
-    fetchMoreArticles: async () => {
-        const { pagination, isLoadingMore } = get();
-
-        if (!pagination.hasMore || isLoadingMore) return;
-
-        set({ isLoadingMore: true, error: null });
-
-        try {
-            const nextPage = pagination.page + 1;
-            const response = await articlesApi.getArticles({
-                page: nextPage,
-                limit: pagination.limit,
-            });
-
-            set((state) => ({
-                articles: [...state.articles, ...response.data],
-                pagination: {
-                    page: response.currentPage,
-                    totalPages: response.totalPages,
-                    total: response.total,
-                    hasMore: response.currentPage < response.totalPages,
-                    limit: 10
-                },
-                isLoadingMore: false,
-            }));
-        } catch (error) {
-            const apiError = error as ApiError;
-            set({ error: apiError.message, isLoadingMore: false });
-        }
-    },
 
     fetchArticleBySlug: async (slug: string) => {
         set({ isLoading: true, error: null });
@@ -136,7 +99,7 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
 
         try {
             const article = await articlesApi.getArticleById(id);
-            set({ currentArticle: article, isLoading: false });
+            set({ selectedArticle: article, isLoading: false });
         } catch (error) {
             const apiError = error as ApiError;
             set({ error: apiError.message, isLoading: false });
@@ -177,7 +140,7 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
                     article._id === id ? updatedArticle : article
                 ),
                 currentArticle:
-                    state.currentArticle?._id === id ? updatedArticle : state.currentArticle,
+                    state.selectedArticle?._id === id ? updatedArticle : state.selectedArticle,
                 isLoading: false,
             }));
         } catch (error) {
@@ -209,32 +172,16 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
     // Like article
     likeArticle: async (id: string) => {
         try {
-            const updatedArticle = await articlesApi.likeArticle(id);
+            const { data: { likesCount, isLiked } } = await articlesApi.likeArticle(id);
 
             set((state) => ({
                 articles: state.articles.map((article) =>
-                    article._id === id ? updatedArticle : article
+                    article._id === id ? { ...article, likesCount, isLiked } : article
                 ),
-                currentArticle:
-                    state.currentArticle?._id === id ? updatedArticle : state.currentArticle,
-            }));
-        } catch (error) {
-            const apiError = error as ApiError;
-            set({ error: apiError.message });
-        }
-    },
-
-    // Unlike article
-    unlikeArticle: async (id: string) => {
-        try {
-            const updatedArticle = await articlesApi.unlikeArticle(id);
-
-            set((state) => ({
-                articles: state.articles.map((article) =>
-                    article._id === id ? updatedArticle : article
-                ),
-                currentArticle:
-                    state.currentArticle?._id === id ? updatedArticle : state.currentArticle,
+                selectedArticle:
+                    state.selectedArticle?._id === id ?
+                        { ...state.selectedArticle, likesCount, isLiked } :
+                        state.selectedArticle,
             }));
         } catch (error) {
             const apiError = error as ApiError;
@@ -254,9 +201,6 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
             set({ error: apiError.message, isLoading: false });
         }
     },
-
-    // Clear current article
-    clearCurrentArticle: () => set({ currentArticle: null }),
 
     // Clear selected article
     clearSelectedArticle: () => set({ selectedArticle: null }),

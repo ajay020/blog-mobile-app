@@ -18,7 +18,6 @@ export const API_ENDPOINTS = {
     ARTICLE_BY_ID: (id: string) => `/articles/${id}`,
     ARTICLE_BY_SLUG: (slug: string) => `/articles/${slug}`,
     ARTICLE_LIKE: (id: string) => `/articles/${id}/like`,
-    ARTICLE_UNLIKE: (id: string) => `/articles/${id}/unlike`,
     MY_ARTICLES: '/articles/my-articles',
 
     // Comment endpoints
