@@ -1,18 +1,23 @@
 import ContentRenderer from '@/components/articles/ContentRenderer';
-import { useArticlesStore } from '@/store';
+import InteractionBar from '@/components/floating-Interaction-bar';
+import { useArticlesStore, useAuthStore } from '@/store';
 import { format } from 'date-fns';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function ArticleDetail() {
     const { slug } = useLocalSearchParams<{ slug: string }>();
+    const { user } = useAuthStore();
     const {
         selectedArticle,
         fetchArticleBySlug,
         isLoading,
-        clearSelectedArticle
+        clearSelectedArticle,
+        likeArticle,
+
     } = useArticlesStore();
 
     useEffect(() => {
@@ -31,36 +36,54 @@ export default function ArticleDetail() {
     }
 
     return (
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-            {/* Set the screen title dynamically */}
-            <Stack.Screen options={{ title: '', headerShadowVisible: false }} />
+        <SafeAreaView style={{ flex: 1 }}>
+            <View style={styles.container}>
+                <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+                    {/* Set the screen title dynamically */}
+                    <Stack.Screen options={{ title: '', headerShadowVisible: false }} />
 
-            {selectedArticle.coverImage && (
-                <Image source={{ uri: selectedArticle.coverImage }} style={styles.coverImage} />
-            )}
+                    {selectedArticle.coverImage && (
+                        <Image source={{ uri: selectedArticle.coverImage }} style={styles.coverImage} />
+                    )}
 
-            <View style={styles.contentContainer}>
-                <Text style={styles.title}>{selectedArticle.title}</Text>
+                    <View style={styles.contentContainer}>
+                        <Text style={styles.title}>{selectedArticle.title}</Text>
 
-                {/* Author Info Section */}
-                <View style={styles.authorSection}>
-                    <Image source={{ uri: selectedArticle.author.avatar }} style={styles.avatar} />
-                    <View>
-                        <Text style={styles.authorName}>{selectedArticle.author.name}</Text>
-                        <Text style={styles.metaText}>
-                            {format(new Date(selectedArticle.createdAt), 'MMM d, yyyy')} · {selectedArticle.readingTime} min read
+                        {/* Article Content - Using your excerpt for now as a placeholder */}
+                        <Text style={styles.bodyText}>
+                            {selectedArticle.excerpt}
                         </Text>
-                    </View>
-                </View>
 
-                {/* Article Content - Using your excerpt for now as a placeholder */}
-                <Text style={styles.bodyText}>
-                    {selectedArticle.excerpt}
-                    {"\n"}
-                </Text>
-                <ContentRenderer blocks={selectedArticle.content.blocks} />
+                        {/* Author Info Section */}
+                        <View style={styles.authorSection}>
+                            <Image source={{ uri: selectedArticle.author.avatar }} style={styles.avatar} />
+                            <View>
+                                <Text style={styles.authorName}>{selectedArticle.author.name}</Text>
+                                <Text style={styles.metaText}>
+                                    {format(new Date(selectedArticle.createdAt), 'MMM d, yyyy')} · {selectedArticle.readingTime} min read
+                                </Text>
+                            </View>
+                        </View>
+                        <ContentRenderer blocks={selectedArticle.content.blocks} />
+                    </View>
+                </ScrollView>
+
+                {/* Floating Bar */}
+                <InteractionBar
+                    isLiked={
+                        user ?
+                            selectedArticle.likes.includes(user.id)
+                            : false
+                    }
+                    likesCount={selectedArticle.likesCount}
+                    commentsCount={selectedArticle.commentsCount}
+                    onLike={() => likeArticle(selectedArticle._id)}
+                    onCommentPress={() => console.log("Show Comments Sheet")}
+                    articleTitle={selectedArticle.title}
+                    articleSlug={selectedArticle.slug}
+                />
             </View>
-        </ScrollView>
+        </SafeAreaView>
     );
 }
 

@@ -1,6 +1,7 @@
 import { articlesApi } from '@/api';
 import { ApiError, Article, CreateArticleDto, UpdateArticleDto } from '@/types';
 import { create } from 'zustand';
+import { useAuthStore } from './authStore';
 
 interface ArticlesState {
     // State
@@ -171,16 +172,40 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
 
     // Like article
     likeArticle: async (id: string) => {
+        const { user } = useAuthStore.getState();
         try {
             const { data: { likesCount, isLiked } } = await articlesApi.likeArticle(id);
 
+            // console.log("Like response", { likesCount, isLiked });
+            const currentUserId = user?.id;
+
+            if (!currentUserId) {
+                console.log("User not logged in, cannot like article", user);
+                set({ error: 'You must be logged in to like articles.' });
+                return;
+            }
+
             set((state) => ({
                 articles: state.articles.map((article) =>
-                    article._id === id ? { ...article, likesCount, isLiked } : article
+                    article._id === id ?
+                        {
+                            ...article,
+                            likesCount,
+                            likes: isLiked ?
+                                [...article.likes, currentUserId] :
+                                article.likes.filter(userId => userId !== currentUserId)
+                        } :
+                        article
                 ),
                 selectedArticle:
                     state.selectedArticle?._id === id ?
-                        { ...state.selectedArticle, likesCount, isLiked } :
+                        {
+                            ...state.selectedArticle,
+                            likesCount,
+                            likes: isLiked ?
+                                [...state.selectedArticle.likes, currentUserId] :
+                                state.selectedArticle.likes.filter(userId => userId !== currentUserId)
+                        } :
                         state.selectedArticle,
             }));
         } catch (error) {

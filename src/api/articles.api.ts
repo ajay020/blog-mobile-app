@@ -87,7 +87,7 @@ export const articlesApi = {
      * Like an article
      */
     likeArticle: async (id: string): Promise<LikeResponse> => {
-        const response = await apiClient.post<LikeResponse>(
+        const response = await apiClient.put<LikeResponse>(
             API_ENDPOINTS.ARTICLE_LIKE(id)
         );
         return response;

@@ -18,7 +18,7 @@ interface ContentRendererProps {
 const ContentRenderer: React.FC<ContentRendererProps> = ({ blocks }) => {
     const { width } = useWindowDimensions();
 
-    console.log("Rendering content with blocks:", blocks);
+    // console.log("Rendering content with blocks:", blocks);
 
 
     const renderBlocks = () => {
