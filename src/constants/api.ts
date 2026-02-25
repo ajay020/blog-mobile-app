@@ -22,6 +22,10 @@ export const API_ENDPOINTS = {
 
     // Comment endpoints
     ARTICLE_COMMENTS: (articleId: string) => `/articles/${articleId}/comments`,
+    CREATE_COMMENT: (articleId: string) => `/articles/${articleId}/comments`,
+    UPDATE_COMMENT: (commentId: string) => `/comments/${commentId}`,
+    DELETE_COMMENT: (commentId: string) => `/comments/${commentId}`,
+    TOGGLE_COMMENT_LIKE: (commentId: string) => `/comments/${commentId}/like`,
     COMMENT_BY_ID: (articleId: string, commentId: string) =>
         `/articles/${articleId}/comments/${commentId}`,
 

@@ -18,3 +18,33 @@ export interface Comment {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface CommentState {
+    comments: Comment[];
+    isLoading: boolean;
+    error: string | null;
+}
+
+export interface CreateCommentData {
+    content: string;
+    parentComment?: string;
+}
+
+export interface CommentResponse {
+    success: boolean;
+    data: Comment;
+}
+
+export interface CommentsResponse {
+    success: boolean;
+    data: Comment[];
+    count: number;
+}
+
+export interface ToggleCommentLikeResponse {
+    success: boolean;
+    data: {
+        likesCount: number;
+        isLiked: boolean;
+    };
+}
