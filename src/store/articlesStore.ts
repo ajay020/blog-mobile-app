@@ -6,6 +6,8 @@ interface ArticlesState {
     // State
     articles: Article[];
     currentArticle: Article | null;
+    selectedArticle: Article | null;
+
     myArticles: Article[];
     isLoading: boolean;
     isLoadingMore: boolean;
@@ -26,6 +28,7 @@ interface ArticlesState {
     }) => Promise<void>;
     fetchMoreArticles: () => Promise<void>;
     fetchArticleById: (id: string) => Promise<void>;
+    fetchArticleBySlug: (slug: string) => Promise<void>;
     createArticle: (data: CreateArticleDto) => Promise<Article>;
     updateArticle: (id: string, data: UpdateArticleDto) => Promise<void>;
     deleteArticle: (id: string) => Promise<void>;
@@ -33,6 +36,7 @@ interface ArticlesState {
     unlikeArticle: (id: string) => Promise<void>;
     fetchMyArticles: () => Promise<void>;
     clearCurrentArticle: () => void;
+    clearSelectedArticle: () => void;
     clearError: () => void;
 }
 
@@ -40,6 +44,7 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
     // Initial state
     articles: [],
     currentArticle: null,
+    selectedArticle: null,
     myArticles: [],
     isLoading: false,
     isLoadingMore: false,
@@ -63,7 +68,7 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
                 tag: params.tag,
             });
 
-            console.log("Articles", response);
+            // console.log("Articles", response);
 
             set({
                 articles: response.data,
@@ -111,6 +116,17 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
         } catch (error) {
             const apiError = error as ApiError;
             set({ error: apiError.message, isLoadingMore: false });
+        }
+    },
+
+    fetchArticleBySlug: async (slug: string) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await articlesApi.getArticleBySlug(slug);
+
+            set({ selectedArticle: response, isLoading: false });
+        } catch (err) {
+            set({ error: 'Failed to load article', isLoading: false });
         }
     },
 
@@ -241,6 +257,9 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
 
     // Clear current article
     clearCurrentArticle: () => set({ currentArticle: null }),
+
+    // Clear selected article
+    clearSelectedArticle: () => set({ selectedArticle: null }),
 
     // Clear error
     clearError: () => set({ error: null }),

@@ -41,6 +41,18 @@ export const articlesApi = {
         return response.data;
     },
 
+
+    /**
+     * Get article by slug
+     */
+    getArticleBySlug: async (slug: string): Promise<Article> => {
+        const response = await apiClient.get<ApiResponse<Article>>(
+            API_ENDPOINTS.ARTICLE_BY_SLUG(slug)
+        );
+        return response.data;
+    },
+
+
     /**
      * Create new article
      */

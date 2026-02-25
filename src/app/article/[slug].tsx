@@ -1,22 +1,23 @@
-// app/article/[slug].tsx
+import ContentRenderer from '@/components/articles/ContentRenderer';
 import { useArticlesStore } from '@/store';
 import { format } from 'date-fns';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+
 export default function ArticleDetail() {
     const { slug } = useLocalSearchParams<{ slug: string }>();
-    const { currentArticle, fetchArticleById, isLoading, clearCurrentArticle } = useArticlesStore();
+    const { selectedArticle, fetchArticleBySlug, isLoading, clearSelectedArticle } = useArticlesStore();
 
     useEffect(() => {
-        if (slug) fetchArticleById(slug);
+        if (slug) fetchArticleBySlug(slug);
 
         // Cleanup when leaving the screen
-        return () => clearCurrentArticle();
+        return () => clearSelectedArticle();
     }, [slug]);
 
-    if (isLoading || !currentArticle) {
+    if (isLoading || !selectedArticle) {
         return (
             <View style={styles.centered}>
                 <ActivityIndicator size="large" color="#000" />
@@ -50,10 +51,9 @@ export default function ArticleDetail() {
                 {/* Article Content - Using your excerpt for now as a placeholder */}
                 <Text style={styles.bodyText}>
                     {selectedArticle.excerpt}
-                    {"\n\n"}
-                    {/* Note: In a real app, you'd use a parser for your 'content: OutputData' */}
-                    [Content Body Rendered Here]
+                    {"\n"}
                 </Text>
+                <ContentRenderer blocks={selectedArticle.content.blocks} />
             </View>
         </ScrollView>
     );
