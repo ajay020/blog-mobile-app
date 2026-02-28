@@ -2,7 +2,7 @@ import { API_ENDPOINTS } from '@/constants/api';
 import {
     ApiResponse,
     Article,
-    ArticleResponse,
+    ArticlesResponse,
     Comment,
     CreateArticleDto,
     LikeResponse,
@@ -22,8 +22,8 @@ export const articlesApi = {
         limit?: number;
         tag?: string;
         authorId?: string;
-    }): Promise<ArticleResponse> => {
-        const response = await apiClient.get<ArticleResponse>(
+    }): Promise<ArticlesResponse> => {
+        const response = await apiClient.get<ArticlesResponse>(
             API_ENDPOINTS.ARTICLES,
             { params }
         );

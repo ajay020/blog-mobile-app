@@ -40,7 +40,7 @@ const InteractionBar: React.FC<InteractionBarProps> = ({
         try {
             await Share.share({
                 message: `Check out this article: ${articleTitle}`,
-                url: `https://yourblog.com/article/${articleSlug}`, // URL is iOS specific in the share object
+                url: `https://blog-frontendsr.onrender.com/article/${articleSlug}`,
             });
         } catch (error) {
             console.log('Error sharing:', error);
