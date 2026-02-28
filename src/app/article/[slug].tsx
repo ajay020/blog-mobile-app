@@ -1,16 +1,17 @@
 import ContentRenderer from '@/components/articles/ContentRenderer';
 import CommentsModal from '@/components/comment/comment-modal';
 import InteractionBar from '@/components/floating-Interaction-bar';
+import TopBar from '@/components/topbar';
 import { useArticlesStore, useAuthStore } from '@/store';
 import { format } from 'date-fns';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ActivityIndicator, Image, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function ArticleDetail() {
+    const router = useRouter();
     const [showComments, setShowComments] = useState(false);
     const { slug } = useLocalSearchParams<{ slug: string }>();
     const { user } = useAuthStore();
@@ -39,63 +40,65 @@ export default function ArticleDetail() {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-                <View style={styles.container}>
-                    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-                        {/* Set the screen title dynamically */}
-                        <Stack.Screen options={{ title: '', headerShadowVisible: false }} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+            {/* 1. Force hide the default navigation header */}
+            <Stack.Screen options={{ headerShown: false }} />
 
-                        {selectedArticle.coverImage && (
-                            <Image source={{ uri: selectedArticle.coverImage }} style={styles.coverImage} />
-                        )}
-
-                        <View style={styles.contentContainer}>
-                            <Text style={styles.title}>{selectedArticle.title}</Text>
-
-                            {/* Article Content - Using your excerpt for now as a placeholder */}
-                            <Text style={styles.bodyText}>
-                                {selectedArticle.excerpt}
-                            </Text>
-
-                            {/* Author Info Section */}
-                            <View style={styles.authorSection}>
-                                <Image source={{ uri: selectedArticle.author.avatar }} style={styles.avatar} />
-                                <View>
-                                    <Text style={styles.authorName}>{selectedArticle.author.name}</Text>
-                                    <Text style={styles.metaText}>
-                                        {format(new Date(selectedArticle.createdAt), 'MMM d, yyyy')} · {selectedArticle.readingTime} min read
-                                    </Text>
-                                </View>
-                            </View>
-                            <ContentRenderer blocks={selectedArticle.content.blocks} />
-                        </View>
-                    </ScrollView>
-
-                    {/* Floating Bar */}
-                    <InteractionBar
-                        isLiked={
-                            user ?
-                                selectedArticle.likes.includes(user.id)
-                                : false
-                        }
-                        likesCount={selectedArticle.likesCount}
-                        commentsCount={selectedArticle.commentsCount}
-                        onLike={() => likeArticle(selectedArticle._id)}
-                        onCommentPress={() => setShowComments(true)}
-                        articleTitle={selectedArticle.title}
-                        articleSlug={selectedArticle.slug}
-                    />
-
-                    {showComments && (
-                        <CommentsModal
-                            visible={showComments}
-                            articleId={selectedArticle._id}
-                            onClose={() => setShowComments(false)}
-                        />
+            <View style={styles.container}>
+                <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+                    <TopBar />
+                    {selectedArticle.coverImage && (
+                        <Image source={{ uri: selectedArticle.coverImage }} style={styles.coverImage} />
                     )}
-                </View>
-            </GestureHandlerRootView>
+
+                    <View style={styles.contentContainer}>
+                        <Text style={styles.title}>{selectedArticle.title}</Text>
+
+                        {/* Article Content - Using your excerpt for now as a placeholder */}
+                        <Text style={styles.bodyText}>
+                            {selectedArticle.excerpt}
+                        </Text>
+
+                        {/* Author Info Section */}
+                        <View style={styles.authorSection}>
+                            <Image source={{ uri: selectedArticle.author.avatar }} style={styles.avatar} />
+                            <View>
+                                <Text style={styles.authorName}>{selectedArticle.author.name}</Text>
+                                <Text style={styles.metaText}>
+                                    {format(new Date(selectedArticle.createdAt), 'MMM d, yyyy')} · {selectedArticle.readingTime} min read
+                                </Text>
+                            </View>
+                        </View>
+
+
+
+                        <ContentRenderer blocks={selectedArticle.content.blocks} />
+                    </View>
+                </ScrollView>
+
+                {/* Floating Bar */}
+                <InteractionBar
+                    isLiked={
+                        user ?
+                            selectedArticle.likes.includes(user.id)
+                            : false
+                    }
+                    likesCount={selectedArticle.likesCount}
+                    commentsCount={selectedArticle.commentsCount}
+                    onLike={() => likeArticle(selectedArticle._id)}
+                    onCommentPress={() => setShowComments(true)}
+                    articleTitle={selectedArticle.title}
+                    articleSlug={selectedArticle.slug}
+                />
+
+                {showComments && (
+                    <CommentsModal
+                        visible={showComments}
+                        articleId={selectedArticle._id}
+                        onClose={() => setShowComments(false)}
+                    />
+                )}
+            </View>
         </SafeAreaView>
     );
 }
@@ -105,6 +108,14 @@ const styles = StyleSheet.create({
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     coverImage: { width: '100%', height: 250 },
     contentContainer: { padding: 20 },
+    backButton: {
+        marginLeft: Platform.OS === 'ios' ? 0 : 10,
+        padding: 8,
+    },
+    headerIcon: {
+        marginRight: Platform.OS === 'ios' ? 0 : 10,
+        padding: 8,
+    },
     title: {
         fontSize: 28,
         fontWeight: '800',
