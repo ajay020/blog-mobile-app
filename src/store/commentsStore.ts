@@ -25,6 +25,8 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
 
         try {
             const response = await commentsApi.getComments(articleId);
+            // console.log('Fetched comments:', response);
+
             set({ comments: response.data, isLoading: false });
         } catch (error) {
             const apiError = error as ApiError;
@@ -34,11 +36,42 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
 
     // Create a comment
     createComment: async (articleId: string, content: string, parentCommentId?: string) => {
+        // console.log('Creating comment:', { articleId, content, parentCommentId });
         set({ isLoading: true, error: null });
 
+        const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+        await delay(2000);
+
+        // Optimistically add the new comment to the UI
+        const tempComment: Comment = {
+            _id: `temp-${Date.now()}`, // Temporary ID for optimistic UI
+            content,
+            author: {
+                _id: useAuthStore.getState().user?.id || '',
+                name: useAuthStore.getState().user?.name || 'You',
+                avatar: useAuthStore.getState().user?.avatar || undefined,
+            },
+            createdAt: new Date().toISOString(),
+            likesCount: 0,
+            likes: [],
+            article: "",
+            isDeleted: false,
+            updatedAt: ""
+        };
+
+        set({ comments: [...get().comments, tempComment], isLoading: false });
+
         try {
-            const response = await commentsApi.createComment(articleId, { content, parentComment: parentCommentId });
-            set({ comments: [...get().comments, response.data], isLoading: false });
+            const response = await commentsApi.createComment(
+                articleId,
+                { content, parentComment: parentCommentId }
+            );
+
+            set({
+                comments: [...get().comments.filter(c => c._id !== tempComment._id), response.data],
+                isLoading: false
+            }
+            );
         } catch (error) {
             const apiError = error as ApiError;
             set({ error: apiError.message, isLoading: false });
@@ -86,30 +119,78 @@ export const useCommentsStore = create<CommentsState>((set, get) => ({
             set({ error: 'You must be logged in to like a comment.' });
             return;
         }
-        const currentUserId = user.id;
+
+        get().comments.forEach(comment => {
+            if (comment._id === commentId || comment.replies?.some(reply => reply._id === commentId)) {
+                console.log('Current like status for comment:', {
+                    commentId,
+                    isLiked: comment.likes.includes(user.id),
+                    likesCount: comment.likesCount,
+                });
+            }
+        });
+
+        // Optimistically update the UI
+        set({
+            comments: get().comments.map(c =>
+                c._id === commentId
+                    ? {
+                        ...c,
+                        likesCount: c.likes.includes(user.id) ? c.likesCount - 1 : c.likesCount + 1,
+                        likes: c.likes.includes(user.id)
+                            ? c.likes.filter(id => id !== user.id)
+                            : [...c.likes, user.id],
+                    }
+                    : {
+                        ...c,
+                        replies: c.replies?.map(r =>
+                            r._id === commentId
+                                ? {
+                                    ...r,
+                                    likesCount: r.likes.includes(user.id) ? r.likesCount - 1 : r.likesCount + 1,
+                                    likes: r.likes.includes(user.id)
+                                        ? r.likes.filter(id => id !== user.id)
+                                        : [...r.likes, user.id],
+                                }
+                                : r
+                        )
+                    }
+
+            ),
+        });
 
         set({ isLoading: true, error: null });
         try {
             const response = await commentsApi.toggleCommentLike(commentId);
+            console.log('Toggled comment like:', response, commentId);
 
+            // Update the comment with the response from the server to ensure consistency
             set({
-                comments: get().comments.map(comment =>
-                    comment._id === commentId
-                        ? {
-                            ...comment,
-                            likesCount: response.data.likesCount,
-                            likes: [
-                                ...comment.likes.filter(id => id !== currentUserId),
-                                ...(response.data.isLiked ? [currentUserId] : [])
-                            ],
+                comments: get().comments.map(c =>
+                    c._id === commentId ? {
+                        ...c,
+                        likesCount: response.data.likesCount,
+                        likes: response.data.isLiked ? [...c.likes, user.id] : c.likes.filter(id => id !== user.id),
+                    }
+                        : {
+                            ...c,
+                            replies: c.replies?.map(r =>
+                                r._id === commentId
+                                    ? {
+                                        ...r,
+                                        likesCount: response.data.likesCount,
+                                        likes: response.data.isLiked ? [...r.likes, user.id] : r.likes.filter(id => id !== user.id),
+                                    }
+                                    : r
+                            )
                         }
-                        : comment
                 ),
                 isLoading: false,
             });
         } catch (error) {
             const apiError = error as ApiError;
             set({ error: apiError.message, isLoading: false });
+            console.log('failed comment like', error);
         }
     }
 }));

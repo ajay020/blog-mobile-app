@@ -16,13 +16,6 @@ export interface PaginatedResponse<T> {
     };
 }
 
-export interface ArticleResponse {
-    success: boolean,
-    data: Article[],
-    totalPages: number,
-    currentPage: number,
-    total: number,
-}
 
 export interface ApiError {
     message: string;

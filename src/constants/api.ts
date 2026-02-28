@@ -1,5 +1,5 @@
 export const API_BASE_URL = __DEV__
-    ? 'http://10.145.203.37:5000/api' // For development
+    ? 'http://10.139.213.37:5000/api' // For development
     : ' https://blog-backend-a08f.onrender.com/api'; // For production
 
 

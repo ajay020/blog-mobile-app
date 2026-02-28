@@ -111,3 +111,11 @@ export interface UpdateArticleDto {
     coverImage?: string;
     tags?: string[];
 }
+
+// export interface ArticleResponse {
+//     success: boolean,
+//     data: Article[],
+//     totalPages: number,
+//     currentPage: number,
+//     total: number,
+// }
