@@ -19,6 +19,8 @@ interface InteractionBarProps {
     onCommentPress: () => void;
     articleTitle: string;
     articleSlug: string;
+    onBookmark: () => void;
+    isBookmarked: boolean;
 }
 
 const InteractionBar: React.FC<InteractionBarProps> = ({
@@ -29,6 +31,8 @@ const InteractionBar: React.FC<InteractionBarProps> = ({
     onCommentPress,
     articleTitle,
     articleSlug,
+    onBookmark,
+    isBookmarked
 }) => {
 
     const handleLike = () => {
@@ -65,8 +69,12 @@ const InteractionBar: React.FC<InteractionBarProps> = ({
                 </TouchableOpacity>
 
                 {/* BOOKMARK BUTTON */}
-                <TouchableOpacity style={styles.button} activeOpacity={0.7}>
-                    <Ionicons name="bookmark-outline" size={20} color="#6b6b6b" />
+                <TouchableOpacity style={styles.button} onPress={onBookmark} activeOpacity={0.7}>
+                    <Ionicons
+                        name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
+                        size={22}
+                        color={isBookmarked ? '#111' : '#777'}
+                    />
                 </TouchableOpacity>
 
                 {/* SHARE BUTTON */}

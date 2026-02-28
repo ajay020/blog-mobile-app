@@ -3,15 +3,15 @@ import CommentsModal from '@/components/comment/comment-modal';
 import InteractionBar from '@/components/floating-Interaction-bar';
 import TopBar from '@/components/topbar';
 import { useArticlesStore, useAuthStore } from '@/store';
+import { useBookmarkStore } from '@/store/bookmarkStore';
 import { format } from 'date-fns';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function ArticleDetail() {
-    const router = useRouter();
     const [showComments, setShowComments] = useState(false);
     const { slug } = useLocalSearchParams<{ slug: string }>();
     const { user } = useAuthStore();
@@ -23,6 +23,9 @@ export default function ArticleDetail() {
         likeArticle,
 
     } = useArticlesStore();
+
+    const { toggleBookmark, checkIsBookmarked, isBookmarkedMap } = useBookmarkStore();
+    const isBookmarked = selectedArticle ? isBookmarkedMap[selectedArticle._id] : false;
 
     useEffect(() => {
         if (slug) fetchArticleBySlug(slug);
@@ -70,8 +73,6 @@ export default function ArticleDetail() {
                             </View>
                         </View>
 
-
-
                         <ContentRenderer blocks={selectedArticle.content.blocks} />
                     </View>
                 </ScrollView>
@@ -89,6 +90,8 @@ export default function ArticleDetail() {
                     onCommentPress={() => setShowComments(true)}
                     articleTitle={selectedArticle.title}
                     articleSlug={selectedArticle.slug}
+                    onBookmark={() => toggleBookmark(selectedArticle._id)}
+                    isBookmarked={isBookmarked}
                 />
 
                 {showComments && (

@@ -29,6 +29,10 @@ export const API_ENDPOINTS = {
     COMMENT_BY_ID: (articleId: string, commentId: string) =>
         `/articles/${articleId}/comments/${commentId}`,
 
+    // Bookmark endpoints
+
+    
+
     // User endpoints
     USER_PROFILE: (userId: string) => `/users/${userId}`,
     UPDATE_PROFILE: '/users/profile',
