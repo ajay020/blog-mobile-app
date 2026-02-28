@@ -66,7 +66,7 @@ export const useBookmarkStore = create<BookmarkState>((set, get) => ({
         try {
             const res = await bookmarkapiClient.toggleBookmark(articleId);
 
-            console.log("Bookmark response: ", res);
+            // console.log("Bookmark response: ", res);
 
             // Sync with server response (source of truth)
             set((state) => ({

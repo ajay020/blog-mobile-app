@@ -34,6 +34,14 @@ export default function ArticleDetail() {
         return () => clearSelectedArticle();
     }, [slug]);
 
+    useEffect(() => {
+        if (selectedArticle) {
+            checkIsBookmarked(selectedArticle._id);
+        }
+    }, [selectedArticle])
+
+
+
     if (isLoading || !selectedArticle) {
         return (
             <View style={styles.centered}>
