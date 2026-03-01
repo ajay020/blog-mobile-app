@@ -1,7 +1,8 @@
+import { useBookmarkStore } from '@/store/bookmarkStore';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     Platform,
     Share,
@@ -19,8 +20,7 @@ interface InteractionBarProps {
     onCommentPress: () => void;
     articleTitle: string;
     articleSlug: string;
-    onBookmark: () => void;
-    isBookmarked: boolean;
+    articleId: string;
 }
 
 const InteractionBar: React.FC<InteractionBarProps> = ({
@@ -31,13 +31,23 @@ const InteractionBar: React.FC<InteractionBarProps> = ({
     onCommentPress,
     articleTitle,
     articleSlug,
-    onBookmark,
-    isBookmarked
+    articleId
 }) => {
+    const { toggleBookmark, checkIsBookmarked, isBookmarkedMap } = useBookmarkStore();
+    const isBookmarked = articleId ? isBookmarkedMap[articleId] : false;
+
+    useEffect(() => {
+        checkIsBookmarked(articleId)
+    }, [articleId])
 
     const handleLike = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         onLike();
+    };
+
+    const handleBookmark = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        toggleBookmark(articleId);
     };
 
     const handleShare = async () => {
@@ -69,7 +79,7 @@ const InteractionBar: React.FC<InteractionBarProps> = ({
                 </TouchableOpacity>
 
                 {/* BOOKMARK BUTTON */}
-                <TouchableOpacity style={styles.button} onPress={onBookmark} activeOpacity={0.7}>
+                <TouchableOpacity style={styles.button} onPress={handleBookmark} activeOpacity={0.7}>
                     <Ionicons
                         name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
                         size={22}

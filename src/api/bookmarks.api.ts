@@ -1,6 +1,6 @@
 import {
     BookmarksResponse, GetBookmarksParams,
-    IsBookmarkedResponse, RemoveBookmarkResponse,
+    IsBookmarkedResponse,
     ToggleBookmarkResponse
 } from "@/types/bookmark.types";
 import { apiClient } from ".";
@@ -36,11 +36,4 @@ export const bookmarkapiClient = {
         return response;
     },
 
-    // Remove bookmark by ID
-    removeBookmark: async (bookmarkId: string): Promise<RemoveBookmarkResponse> => {
-        const response = await apiClient.delete<RemoveBookmarkResponse>(
-            `/bookmarks/${bookmarkId}`
-        );
-        return response;
-    }
 }

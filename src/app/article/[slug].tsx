@@ -3,7 +3,6 @@ import CommentsModal from '@/components/comment/comment-modal';
 import InteractionBar from '@/components/floating-Interaction-bar';
 import TopBar from '@/components/topbar';
 import { useArticlesStore, useAuthStore } from '@/store';
-import { useBookmarkStore } from '@/store/bookmarkStore';
 import { format } from 'date-fns';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -24,22 +23,12 @@ export default function ArticleDetail() {
 
     } = useArticlesStore();
 
-    const { toggleBookmark, checkIsBookmarked, isBookmarkedMap } = useBookmarkStore();
-    const isBookmarked = selectedArticle ? isBookmarkedMap[selectedArticle._id] : false;
-
     useEffect(() => {
         if (slug) fetchArticleBySlug(slug);
 
         // Cleanup when leaving the screen
         return () => clearSelectedArticle();
     }, [slug]);
-
-    useEffect(() => {
-        if (selectedArticle) {
-            checkIsBookmarked(selectedArticle._id);
-        }
-    }, [selectedArticle])
-
 
 
     if (isLoading || !selectedArticle) {
@@ -98,8 +87,7 @@ export default function ArticleDetail() {
                     onCommentPress={() => setShowComments(true)}
                     articleTitle={selectedArticle.title}
                     articleSlug={selectedArticle.slug}
-                    onBookmark={() => toggleBookmark(selectedArticle._id)}
-                    isBookmarked={isBookmarked}
+                    articleId={selectedArticle._id}
                 />
 
                 {showComments && (

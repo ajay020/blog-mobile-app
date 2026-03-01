@@ -43,9 +43,9 @@ export const useBookmarkStore = create<BookmarkState>((set, get) => ({
         }
     },
 
-    // ⭐ Toggle bookmark (optimistic)
+    // Toggle bookmark (optimistic)
     toggleBookmark: async (articleId: string) => {
-            console.log("Bookmark article id: ", articleId);
+        console.log("Bookmark article id: ", articleId);
 
         const { user } = useAuthStore.getState();
         if (!user) {
@@ -88,7 +88,7 @@ export const useBookmarkStore = create<BookmarkState>((set, get) => ({
         }
     },
 
-    // 📚 Get user's bookmarks (pagination)
+    // Get user's bookmarks (pagination)
     getBookmarks: async ({ page = 1, limit = 10, reset = false } = {}) => {
         set({ isLoading: true, error: null });
 

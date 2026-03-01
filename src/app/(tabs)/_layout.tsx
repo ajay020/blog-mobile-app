@@ -1,7 +1,7 @@
 import { COLORS } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
@@ -13,15 +13,17 @@ export default function TabsLayout() {
     return (
         <Tabs
             screenOptions={{
+                tabBarShowLabel: false,
                 tabBarActiveTintColor: COLORS.primary,
                 tabBarInactiveTintColor: COLORS.text.secondary,
                 tabBarStyle: {
-                    backgroundColor: COLORS.white,
+                    backgroundColor: COLORS.black,
                     borderTopColor: COLORS.border,
                     borderTopWidth: 1,
                     height: 60 + insets.bottom,
-                    paddingBottom: insets.bottom > 0 ? insets.bottom : 8, // ✅ Use safe area or default
+                    paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
                     paddingTop: 8,
+
                 },
                 tabBarLabelStyle: {
                     fontSize: 12,
@@ -61,13 +63,13 @@ export default function TabsLayout() {
                 }}
             />
             <Tabs.Screen
-                name="create"
+                name="bookmark"
                 options={{
-                    title: 'Create',
+                    title: 'Bookmark',
                     tabBarIcon: ({ color, size }) => (
-                        <TabBarIcon name="create" color={color} size={size} />
+                        <TabBarIcon name="bookmark" color={color} size={size} />
                     ),
-                    headerTitle: 'Write Article',
+                    headerTitle: 'Bookmarked Articles',
                 }}
             />
             <Tabs.Screen
@@ -89,15 +91,13 @@ export default function TabsLayout() {
  */
 function TabBarIcon({ name, color, size }: { name: string; color: string; size: number }) {
     const icons: Record<string, string> = {
-        home: '🏠',
-        explore: '🔍',
-        create: '✏️',
-        profile: '👤',
+        home: "home",
+        explore: 'search',
+        bookmark: 'bookmark-outline',
+        profile: 'person',
     };
 
     return (
-        <Text style={{ fontSize: size, color }}>
-            {icons[name] || '•'}
-        </Text>
+        <Ionicons name={icons[name] as any} size={size} color={color} />
     );
 }
