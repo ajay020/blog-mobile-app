@@ -55,11 +55,11 @@ export default function TabsLayout() {
                 }}
             />
             <Tabs.Screen
-                name="explore"
+                name="search"
                 options={{
-                    title: 'Explore',
+                    title: 'Search',
                     tabBarIcon: ({ color, size }) => (
-                        <TabBarIcon name="explore" color={color} size={size} />
+                        <TabBarIcon name="search" color={color} size={size} />
                     ),
                 }}
             />
@@ -93,7 +93,7 @@ export default function TabsLayout() {
 function TabBarIcon({ name, color, size }: { name: string; color: string; size: number }) {
     const icons: Record<string, string> = {
         home: "home",
-        explore: 'search',
+        search: 'search',
         bookmark: 'bookmark-outline',
         profile: 'person',
     };

@@ -1,5 +1,5 @@
 import { articlesApi } from '@/api';
-import { ApiError, Article, CreateArticleDto, UpdateArticleDto } from '@/types';
+import { ApiError, Article, CreateArticleDto, GetArticlesParams, UpdateArticleDto } from '@/types';
 import { create } from 'zustand';
 import { useAuthStore } from './authStore';
 
@@ -20,11 +20,7 @@ interface ArticlesState {
     };
 
     // Actions
-    fetchArticles: (params?: {
-        page?: number;
-        limit?: number;
-        tag?: string;
-    }) => Promise<void>;
+    fetchArticles: (params?: GetArticlesParams) => Promise<void>;
     fetchArticleById: (id: string) => Promise<void>;
     fetchArticleBySlug: (slug: string) => Promise<void>;
     createArticle: (data: CreateArticleDto) => Promise<Article>;
@@ -53,15 +49,11 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
     },
 
     // Fetch articles
-    fetchArticles: async (params = {}) => {
+    fetchArticles: async (params: GetArticlesParams = {}) => {
         set({ isLoading: true, error: null });
 
         try {
-            const response = await articlesApi.getArticles({
-                page: params.page || 1,
-                limit: params.limit || 10,
-                tag: params.tag,
-            });
+            const response = await articlesApi.getArticles(params);
 
             // console.log("Articles", response);
 

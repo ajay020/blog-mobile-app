@@ -5,6 +5,7 @@ import {
     ArticlesResponse,
     Comment,
     CreateArticleDto,
+    GetArticlesParams,
     LikeResponse,
     UpdateArticleDto
 } from '@/types';
@@ -17,12 +18,9 @@ export const articlesApi = {
     /**
      * Get all articles with pagination
      */
-    getArticles: async (params?: {
-        page?: number;
-        limit?: number;
-        tag?: string;
-        authorId?: string;
-    }): Promise<ArticlesResponse> => {
+    getArticles: async (params?: GetArticlesParams): Promise<ArticlesResponse> => {
+        // console.log("Query params: ", params);
+
         const response = await apiClient.get<ArticlesResponse>(
             API_ENDPOINTS.ARTICLES,
             { params }
