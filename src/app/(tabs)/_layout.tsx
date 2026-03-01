@@ -13,6 +13,7 @@ export default function TabsLayout() {
     return (
         <Tabs
             screenOptions={{
+                headerShown: false,
                 tabBarShowLabel: false,
                 tabBarActiveTintColor: COLORS.primary,
                 tabBarInactiveTintColor: COLORS.text.secondary,
@@ -63,7 +64,7 @@ export default function TabsLayout() {
                 }}
             />
             <Tabs.Screen
-                name="bookmark"
+                name="bookmarks"
                 options={{
                     title: 'Bookmark',
                     tabBarIcon: ({ color, size }) => (

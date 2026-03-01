@@ -13,10 +13,10 @@ interface BookmarkState {
     totalPages: number;
 
     // Actions
+    resetBookmarks: () => void;
     checkIsBookmarked: (articleId: string) => Promise<void>;
     toggleBookmark: (articleId: string) => Promise<void>;
-    getBookmarks: (params?: { page?: number; limit?: number; reset?: boolean }) => Promise<void>;
-    resetBookmarks: () => void;
+    fetchBookmarks: (params?: { page?: number; limit?: number; reset?: boolean }) => Promise<void>;
 }
 
 export const useBookmarkStore = create<BookmarkState>((set, get) => ({
@@ -26,6 +26,28 @@ export const useBookmarkStore = create<BookmarkState>((set, get) => ({
     error: null,
     page: 1,
     totalPages: 1,
+
+
+    // Get user's bookmarks (pagination)
+    fetchBookmarks: async ({ page = 1, limit = 10, reset = false } = {}) => {
+        set({ isLoading: true, error: null });
+
+        try {
+            const res = await bookmarkapiClient.getBookmarks({ page, limit });
+
+            set(() => ({
+                bookmarks: res.data,
+                page: res.currentPage,
+                totalPages: res.totalPages,
+                isLoading: false,
+            }));
+        } catch (error: any) {
+            set({
+                error: error.message || 'Failed to load bookmarks',
+                isLoading: false,
+            });
+        }
+    },
 
     //  Check bookmark status for one article
     checkIsBookmarked: async (articleId: string) => {
@@ -45,7 +67,7 @@ export const useBookmarkStore = create<BookmarkState>((set, get) => ({
 
     // Toggle bookmark (optimistic)
     toggleBookmark: async (articleId: string) => {
-        console.log("Bookmark article id: ", articleId);
+        // console.log("Bookmark article id: ", articleId);
 
         const { user } = useAuthStore.getState();
         if (!user) {
@@ -85,27 +107,6 @@ export const useBookmarkStore = create<BookmarkState>((set, get) => ({
             }));
 
             set({ error: error.message || 'Failed to toggle bookmark' });
-        }
-    },
-
-    // Get user's bookmarks (pagination)
-    getBookmarks: async ({ page = 1, limit = 10, reset = false } = {}) => {
-        set({ isLoading: true, error: null });
-
-        try {
-            const res = await bookmarkapiClient.getBookmarks({ page, limit });
-
-            set((state) => ({
-                bookmarks: reset ? res.data : [...state.bookmarks, ...res.data],
-                page: res.currentPage,
-                totalPages: res.totalPages,
-                isLoading: false,
-            }));
-        } catch (error: any) {
-            set({
-                error: error.message || 'Failed to load bookmarks',
-                isLoading: false,
-            });
         }
     },
 
