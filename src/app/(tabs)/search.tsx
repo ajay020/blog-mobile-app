@@ -9,7 +9,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SearchScreen = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { articles, fetchArticles, isLoading } = useArticlesStore();
+  const {
+    articles,
+    fetchArticles,
+    isLoading,
+    isFetchingMore,
+    pagination
+  } = useArticlesStore();
   const router = useRouter();
 
   // 1. The Debounced Search Logic
@@ -25,6 +31,27 @@ const SearchScreen = () => {
   const onChangeText = (text: string) => {
     setSearchTerm(text);
     handler(text);
+  };
+
+  const handleLoadMore = () => {
+    // Only fetch if we aren't already loading and there's more data to get
+    if (!isLoading && !isFetchingMore && pagination.hasMore) {
+      fetchArticles({
+        search: searchTerm,
+        page: pagination.page + 1,
+        limit: 10
+      }, true);
+    }
+  };
+
+  // Component to show at the bottom while loading
+  const renderFooter = () => {
+    if (!isFetchingMore) return null;
+    return (
+      <View style={{ paddingVertical: 20 }}>
+        <ActivityIndicator size="small" color="#1a8917" />
+      </View>
+    );
   };
 
   return (
@@ -58,6 +85,11 @@ const SearchScreen = () => {
                 onPress={(slug) => router.push(`/article/${slug}`)}
               />
             )}
+            // Infinite Scroll Props
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={renderFooter}
+
             ListEmptyComponent={() => (
               <View style={styles.emptyContainer}>
                 <Text style={styles.emptyText}>

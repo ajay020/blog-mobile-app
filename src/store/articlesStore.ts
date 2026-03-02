@@ -9,7 +9,7 @@ interface ArticlesState {
     selectedArticle: Article | null;
     myArticles: Article[];
     isLoading: boolean;
-    isLoadingMore: boolean;
+    isFetchingMore: boolean;
     error: string | null;
     pagination: {
         page: number;
@@ -20,7 +20,7 @@ interface ArticlesState {
     };
 
     // Actions
-    fetchArticles: (params?: GetArticlesParams) => Promise<void>;
+    fetchArticles: (params?: GetArticlesParams, isLoadMore?: boolean) => Promise<void>;
     fetchArticleById: (id: string) => Promise<void>;
     fetchArticleBySlug: (slug: string) => Promise<void>;
     createArticle: (data: CreateArticleDto) => Promise<Article>;
@@ -39,6 +39,7 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
     myArticles: [],
     isLoading: false,
     isLoadingMore: false,
+    isFetchingMore: false,
     error: null,
     pagination: {
         page: 1,
@@ -49,16 +50,17 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
     },
 
     // Fetch articles
-    fetchArticles: async (params: GetArticlesParams = {}) => {
-        set({ isLoading: true, error: null });
+    fetchArticles: async (params?: GetArticlesParams, isLoadMore = false) => {
+        // If loading more, don't clear the whole screen with a loading spinner
+        if (!isLoadMore) set({ isLoading: true, error: null });
+        else set({ isFetchingMore: true });
 
         try {
             const response = await articlesApi.getArticles(params);
 
-            // console.log("Articles", response);
-
-            set({
-                articles: response.data,
+            set((state) => ({
+                // If loadMore, combine old articles with new ones. Otherwise, replace.
+                articles: isLoadMore ? [...state.articles, ...response.data] : response.data,
                 pagination: {
                     page: response.currentPage,
                     totalPages: response.totalPages,
@@ -67,10 +69,11 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
                     limit: 10
                 },
                 isLoading: false,
-            });
+                isFetchingMore: false,
+            }));
         } catch (error) {
             const apiError = error as ApiError;
-            set({ error: apiError.message, isLoading: false });
+            set({ error: apiError.message, isLoading: false, isFetchingMore: false });
         }
     },
 
@@ -172,7 +175,7 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
             const currentUserId = user?.id;
 
             if (!currentUserId) {
-                console.log("User not logged in, cannot like article", user);
+                // console.log("User not logged in, cannot like article", user);
                 set({ error: 'You must be logged in to like articles.' });
                 return;
             }
