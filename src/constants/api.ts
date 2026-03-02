@@ -18,7 +18,7 @@ export const API_ENDPOINTS = {
     ARTICLE_BY_ID: (id: string) => `/articles/${id}`,
     ARTICLE_BY_SLUG: (slug: string) => `/articles/${slug}`,
     ARTICLE_LIKE: (id: string) => `/articles/${id}/like`,
-    MY_ARTICLES: '/articles/my-articles',
+    MY_ARTICLES: '/articles/me/articles',
 
     // Comment endpoints
     ARTICLE_COMMENTS: (articleId: string) => `/articles/${articleId}/comments`,
@@ -31,7 +31,7 @@ export const API_ENDPOINTS = {
 
     // Bookmark endpoints
 
-    
+
 
     // User endpoints
     USER_PROFILE: (userId: string) => `/users/${userId}`,

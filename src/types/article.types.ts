@@ -72,7 +72,7 @@ export interface GetArticlesParams {
     tag?: string;
     category?: string;
     search?: string;
-    author?: string;
+    authorId?: string;
 }
 
 export interface ArticleResponse {

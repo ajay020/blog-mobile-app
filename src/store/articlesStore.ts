@@ -215,6 +215,7 @@ export const useArticlesStore = create<ArticlesState>((set, get) => ({
 
         try {
             const articles = await articlesApi.getMyArticles();
+            // console.log("Myarticles", articles)
             set({ myArticles: articles, isLoading: false });
         } catch (error) {
             const apiError = error as ApiError;

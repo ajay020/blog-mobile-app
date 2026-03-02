@@ -4,6 +4,7 @@ import {
     ApiError,
     LoginCredentials,
     RegisterCredentials,
+    UpdateProfileData,
     User,
 } from '@/types';
 import { storage } from '@/utils/storage';
@@ -23,8 +24,9 @@ interface AuthState {
     register: (credentials: RegisterCredentials) => Promise<void>;
     logout: () => Promise<void>;
     loadStoredAuth: () => Promise<void>;
-    clearError: () => void;
     updateUser: (user: Partial<User>) => void;
+    updateProfile: (data: UpdateProfileData) => Promise<void>;
+    clearError: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -42,7 +44,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         try {
             const response = await authApi.login(credentials);
-            console.log('Login response: ', response);
+            // console.log('Login response: ', response);
             const { user, token } = response;
 
             // Store auth data
@@ -144,10 +146,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         }
     },
 
-
-    // Clear error
-    clearError: () => set({ error: null }),
-
     // Update user
     updateUser: (userData: Partial<User>) => {
         const currentUser = get().user;
@@ -157,4 +155,31 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             storage.setItem(STORAGE_KEYS.USER_DATA, updatedUser);
         }
     },
+
+    updateProfile: async (data: UpdateProfileData) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await authApi.updateProfile(data);
+            const updatedUser = response.data;
+
+            // Update both the store and the local device storage
+            await storage.setItem(STORAGE_KEYS.USER_DATA, updatedUser);
+
+            set({
+                user: updatedUser,
+                isLoading: false,
+                error: null
+            });
+        } catch (error) {
+            const apiError = error as ApiError;
+            set({
+                error: apiError.message,
+                isLoading: false
+            });
+            throw error; // Let the UI handle the error (like an Alert)
+        }
+    },
+
+    // Clear error
+    clearError: () => set({ error: null }),
 }));

@@ -9,6 +9,7 @@ import {
     LikeResponse,
     UpdateArticleDto
 } from '@/types';
+import { delay } from '@/utils/helper';
 import { apiClient } from './client';
 
 /**
@@ -20,7 +21,7 @@ export const articlesApi = {
      */
     getArticles: async (params?: GetArticlesParams): Promise<ArticlesResponse> => {
         // console.log("Query params: ", params);
-
+        await delay(2000);
         const response = await apiClient.get<ArticlesResponse>(
             API_ENDPOINTS.ARTICLES,
             { params }
@@ -95,6 +96,7 @@ export const articlesApi = {
      * Get user's own articles
      */
     getMyArticles: async (): Promise<Article[]> => {
+        await delay(1000);
         const response = await apiClient.get<ApiResponse<Article[]>>(
             API_ENDPOINTS.MY_ARTICLES
         );
