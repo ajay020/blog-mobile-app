@@ -1,4 +1,5 @@
 import { imageUploadApi } from '@/api/image-upload.api';
+import TopBar from '@/components/topbar';
 import { useAuthStore } from '@/store';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
@@ -95,6 +96,7 @@ export default function EditProfileScreen() {
             ]);
         } catch (error) {
             // Error is already handled in your store, but you can add local feedback here
+            console.log("Upload image error", error);
         }
     };
 
@@ -104,9 +106,7 @@ export default function EditProfileScreen() {
             style={styles.container}
         >
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Edit Profile</Text>
-                </View>
+                <TopBar title='Edit Profile' />
 
                 {/* Avatar Edit Section */}
                 <View style={styles.avatarSection}>
